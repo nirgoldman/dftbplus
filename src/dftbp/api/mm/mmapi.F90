@@ -20,7 +20,7 @@ module dftbp_mmapi
       & setExternalPotential, getTdForces, setTdCoordsAndVelos, setTdElectricField,&
       & initializeTimeProp, updateDataDependentOnSpeciesOrdering, getAtomicMasses,&
       & getGrossCharges, getCM5Charges, getElStatPotential, getExtChargeGradients, getStressTensor,&
-      & getGradients, getEnergy, setQDepExtPotProxy, setExternalCharges, setGeometry
+      & getGradients, getEnergy, getTS, setQDepExtPotProxy, setExternalCharges, setGeometry
   use dftbp_dftbplus_parser, only : TParserFlags, rootTag, parseHsdTree, readHsdFile
   use dftbp_dftbplus_qdepextpotgen, only : TQDepExtPotGen, TQDepExtPotGenWrapper
   use dftbp_dftbplus_qdepextpotproxy, only : TQDepExtPotProxy, TQDepExtPotProxy_init
@@ -88,6 +88,8 @@ module dftbp_mmapi
     procedure :: setExternalCharges => TDftbPlus_setExternalCharges
     !> add reactive external charges to a calculator
     procedure :: setQDepExtPotGen => TDftbPlus_setQDepExtPotGen
+    !> obtain the DFTB+ TS value
+    procedure :: getTS => TDftbPlus_getTS
     !> obtain the DFTB+ energy
     procedure :: getEnergy => TDftbPlus_getEnergy
     !> obtain the DFTB+ gradients
@@ -493,6 +495,21 @@ contains
 
   end subroutine TDftbPlus_setQDepExtPotGen
 
+  !> Return the electronic entropy contribution of the current system.
+  !> Needed for shock compression simulations with MSST
+  subroutine TDftbPlus_getTS(this, TS)
+
+    !> Instance.
+    class(TDftbPlus), intent(inout) :: this
+
+    !> Mermin free energy.
+    real(dp), intent(out) :: TS
+
+    call this%checkInit()
+
+    call getTS(this%env, this%main, TS)
+
+  end subroutine TDftbPlus_getTS
 
   !> Return the energy of the current system.
   subroutine TDftbPlus_getEnergy(this, merminEnergy)
