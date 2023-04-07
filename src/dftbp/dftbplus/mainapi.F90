@@ -31,6 +31,8 @@ module dftbp_dftbplus_mainapi
   private
   public :: setGeometry, setQDepExtPotProxy, setExternalPotential, setExternalCharges
   public :: getEnergy, getGradients, getExtChargeGradients, getGrossCharges, getCM5Charges
+!!!
+  public :: getTS
   public :: getElStatPotential, getStressTensor, nrOfAtoms, nrOfKPoints, getAtomicMasses
   public :: updateDataDependentOnSpeciesOrdering, checkSpeciesNames
   public :: initializeTimeProp, doOneTdStep, setTdElectricField, setTdCoordsAndVelos, getTdForces
@@ -90,8 +92,28 @@ contains
     end if
 
   end subroutine setGeometry
+!!!
+  !> Returns the electronic entropy contribution of the system at finite temperature
+  !> Needed for shock compression simulations through the MSST method
+  subroutine getTS(env, main, TS)
 
+    !> Instance
+    type(TEnvironment), intent(inout) :: env
 
+    !> Instance
+    type(TDftbPlusMain), intent(inout) :: main
+
+    !> Resulting energy
+    real(dp), intent(out) :: TS
+
+    integer :: iDet
+
+    call recalcGeometry(env, main)
+    iDet = size(main%dftbEnergy)
+    TS = sum(main%dftbEnergy(iDet)%TS)
+
+  end subroutine getTS
+!!!
   !> Returns the free energy of the system at finite temperature
   subroutine getEnergy(env, main, merminEnergy)
 

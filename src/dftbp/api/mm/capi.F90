@@ -384,6 +384,22 @@ contains
 
   end subroutine c_DftbPlus_get_atom_nr_basis
 
+  !> Obtain the DFTB+ value for TS
+  !> Needed for shock compression simulations with MSST
+  subroutine c_DftbPlus_getTS(handler, TS) bind(C, name='dftbp_get_TS')
+
+    !> handler for the calculation
+    type(c_DftbPlus), intent(inout) :: handler
+
+    !> resulting energy
+    real(c_double), intent(out) :: TS
+
+    type(TDftbPlusC), pointer :: instance
+
+    call c_f_pointer(handler%instance, instance)
+    call instance%getTS(TS)
+
+  end subroutine c_DftbPlus_getTS
 
   !> Obtain the DFTB+ energy
   subroutine c_DftbPlus_getEnergy(handler, merminEnergy) bind(C, name='dftbp_get_energy')
